@@ -1,4 +1,42 @@
-# Quiz-Nepal
+# Quiz Battle Nepal
+
+Quiz Battle Nepal is now a Flutter-only mobile app. The active application code lives in `lib/`, the Android host project lives in `android/`, and automated Flutter tests live in `test/`.
+
+## Flutter project structure
+
+- `lib/main.dart` starts the Flutter app.
+- `lib/app.dart` configures the Material app, theme, and first screen.
+- `lib/screens/` contains the app screens for splash, home, categories, quiz, results, leaderboard, and profile.
+- `lib/widgets/` contains reusable Flutter UI widgets.
+- `lib/services/` contains quiz, scoring, storage, explanation, and ad service logic.
+- `lib/data/questions/` contains bundled JSON question banks declared as Flutter assets in `pubspec.yaml`.
+- `android/` contains the Flutter Android embedding and Gradle configuration.
+
+## Local development
+
+Install Flutter, then run:
+
+```bash
+flutter pub get
+flutter run
+```
+
+Useful checks:
+
+```bash
+flutter analyze
+flutter test
+```
+
+## Android build
+
+Create a debug APK with:
+
+```bash
+flutter build apk --debug
+```
+
+For release builds, configure signing in the Android project before distributing the app.
 
 ## AdMob integration
 
