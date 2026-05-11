@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+# Lightweight Gradle launcher for this MVP environment. Replace with an official Gradle wrapper before production CI if desired.
+exec gradle "$@"
