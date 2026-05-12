@@ -13,9 +13,9 @@ class BannerAdPlaceholder extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.secondary.withOpacity(0.08),
+        color: AppColors.secondary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.secondary.withOpacity(0.15)),
+        border: Border.all(color: AppColors.secondary.withValues(alpha: 0.15)),
       ),
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,

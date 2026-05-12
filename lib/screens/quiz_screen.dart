@@ -210,7 +210,7 @@ class _QuizScreenState extends State<QuizScreen> {
               value: progress,
               minHeight: 10,
               color: AppColors.primary,
-              backgroundColor: AppColors.primary.withOpacity(0.12),
+              backgroundColor: AppColors.primary.withValues(alpha: 0.12),
             ),
           ),
           const SizedBox(height: 18),

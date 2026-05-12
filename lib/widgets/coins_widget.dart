@@ -10,7 +10,7 @@ class CoinsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Chip(
-      backgroundColor: AppColors.accent.withOpacity(0.2),
+      backgroundColor: AppColors.accent.withValues(alpha: 0.2),
       avatar: const Icon(Icons.monetization_on, color: AppColors.accent),
       label: Text('$coins coins', style: const TextStyle(fontWeight: FontWeight.w800)),
       side: BorderSide.none,

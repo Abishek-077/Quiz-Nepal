@@ -27,11 +27,11 @@ class QuizOptionButton extends StatelessWidget {
     IconData? trailingIcon;
 
     if (showResult && isCorrect) {
-      backgroundColor = AppColors.success.withOpacity(0.14);
+      backgroundColor = AppColors.success.withValues(alpha: 0.14);
       borderColor = AppColors.success;
       trailingIcon = Icons.check_circle;
     } else if (showResult && isSelected && !isCorrect) {
-      backgroundColor = AppColors.danger.withOpacity(0.14);
+      backgroundColor = AppColors.danger.withValues(alpha: 0.14);
       borderColor = AppColors.danger;
       trailingIcon = Icons.cancel;
     }

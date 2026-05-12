@@ -20,7 +20,7 @@ class CategoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: category.gradient.first.withOpacity(0.22),
+              color: category.gradient.first.withValues(alpha: 0.22),
               blurRadius: 18,
               offset: const Offset(0, 10),
             ),
@@ -30,7 +30,7 @@ class CategoryCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 28,
-              backgroundColor: Colors.white.withOpacity(0.22),
+              backgroundColor: Colors.white.withValues(alpha: 0.22),
               child: Icon(category.icon, color: Colors.white, size: 30),
             ),
             const SizedBox(width: 16),
@@ -50,7 +50,7 @@ class CategoryCard extends StatelessWidget {
                   Text(
                     category.subtitle,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.86),
+                      color: Colors.white.withValues(alpha: 0.86),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
