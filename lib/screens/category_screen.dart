@@ -11,7 +11,9 @@ class CategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Choose Category', style: TextStyle(fontWeight: FontWeight.w900))),
+      appBar: AppBar(
+          title: const Text('Choose Category',
+              style: TextStyle(fontWeight: FontWeight.w900))),
       body: ListView(
         padding: const EdgeInsets.all(18),
         children: [
@@ -22,7 +24,9 @@ class CategoryScreen extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 14),
               child: CategoryCard(
                 category: category,
-                onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => QuizScreen(category: category))),
+                onTap: () => Navigator.of(context).pushReplacement(
+                    MaterialPageRoute<void>(
+                        builder: (_) => QuizScreen(category: category))),
               ),
             ),
           ),

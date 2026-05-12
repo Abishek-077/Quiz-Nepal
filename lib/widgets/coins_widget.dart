@@ -12,7 +12,8 @@ class CoinsWidget extends StatelessWidget {
     return Chip(
       backgroundColor: AppColors.accent.withValues(alpha: 0.2),
       avatar: const Icon(Icons.monetization_on, color: AppColors.accent),
-      label: Text('$coins coins', style: const TextStyle(fontWeight: FontWeight.w800)),
+      label: Text('$coins coins',
+          style: const TextStyle(fontWeight: FontWeight.w800)),
       side: BorderSide.none,
     );
   }

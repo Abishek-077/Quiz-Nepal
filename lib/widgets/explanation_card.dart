@@ -33,11 +33,13 @@ class ExplanationCard extends StatelessWidget {
             children: [
               Icon(Icons.lightbulb, color: AppColors.accent),
               SizedBox(width: 8),
-              Text('Explanation', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+              Text('Explanation',
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
             ],
           ),
           const SizedBox(height: 8),
-          Text(shortExplanation, style: const TextStyle(fontWeight: FontWeight.w700)),
+          Text(shortExplanation,
+              style: const TextStyle(fontWeight: FontWeight.w700)),
           if (fullExplanation != null) ...[
             const Divider(height: 22),
             Text(fullExplanation!),
@@ -46,7 +48,10 @@ class ExplanationCard extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: isUnlocking ? null : onUnlock,
               icon: isUnlocking
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2))
                   : const Icon(Icons.ondemand_video),
               label: const Text('Unlock full explanation'),
             ),

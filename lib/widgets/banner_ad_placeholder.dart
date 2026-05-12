@@ -26,7 +26,8 @@ class BannerAdPlaceholder extends StatelessWidget {
             child: Text(
               AppStrings.mockAdNote,
               textAlign: TextAlign.center,
-              style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.secondary),
+              style: TextStyle(
+                  fontWeight: FontWeight.w700, color: AppColors.secondary),
             ),
           ),
         ],

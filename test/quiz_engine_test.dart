@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:quiz_battle_nepal/services/quiz_engine.dart';
+import 'package:quiz_battle_nepal/features/quiz/domain/services/quiz_engine.dart';
 
 void main() {
   test('correct answer adds score, coins, and answered count', () {

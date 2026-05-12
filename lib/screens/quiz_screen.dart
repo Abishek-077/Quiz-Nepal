@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
-import '../models/category_model.dart';
-import '../models/question_model.dart';
-import '../services/admob_service.dart';
-import '../services/explanation_service.dart';
-import '../services/question_service.dart';
-import '../services/quiz_engine.dart';
-import '../services/score_service.dart';
+import '../core/di/app_dependencies.dart';
+import '../features/quiz/domain/entities/question.dart';
+import '../features/quiz/domain/entities/quiz_category.dart';
+import '../features/quiz/domain/services/quiz_engine.dart';
+import '../features/quiz/domain/usecases/complete_quiz.dart';
+import '../features/quiz/domain/usecases/continue_quiz_with_reward.dart';
+import '../features/quiz/domain/usecases/get_random_quiz_questions.dart';
+import '../features/quiz/domain/usecases/show_quiz_complete_ad.dart';
+import '../features/quiz/domain/usecases/unlock_full_explanation.dart';
 import '../widgets/explanation_card.dart';
 import '../widgets/quiz_option_button.dart';
 import '../widgets/score_header.dart';
@@ -23,15 +25,18 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  final _questionService = QuestionService();
-  final _scoreService = ScoreService();
-  final _adMobService = AdMobService();
-  final _explanationService = ExplanationService();
   final _engine = QuizEngine();
+
+  late GetRandomQuizQuestions _getRandomQuizQuestions;
+  late CompleteQuiz _completeQuiz;
+  late ShowQuizCompleteAd _showQuizCompleteAd;
+  late UnlockFullExplanation _unlockFullExplanation;
+  late ContinueQuizWithReward _continueQuizWithReward;
 
   List<Question> _questions = [];
   int _currentIndex = 0;
   int? _selectedIndex;
+  bool _hasLoadedDependencies = false;
   bool _isLoading = true;
   bool _isUnlocking = false;
   bool _isContinuing = false;
@@ -43,8 +48,16 @@ class _QuizScreenState extends State<QuizScreen> {
   bool get _hasAnswered => _selectedIndex != null;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_hasLoadedDependencies) return;
+    final dependencies = AppScope.of(context);
+    _getRandomQuizQuestions = dependencies.getRandomQuizQuestions;
+    _completeQuiz = dependencies.completeQuiz;
+    _showQuizCompleteAd = dependencies.showQuizCompleteAd;
+    _unlockFullExplanation = dependencies.unlockFullExplanation;
+    _continueQuizWithReward = dependencies.continueQuizWithReward;
+    _hasLoadedDependencies = true;
     _loadQuiz();
   }
 
@@ -60,7 +73,7 @@ class _QuizScreenState extends State<QuizScreen> {
     });
 
     try {
-      final questions = await _questionService.randomQuiz(widget.category);
+      final questions = await _getRandomQuizQuestions(widget.category);
       if (!mounted) return;
       setState(() {
         _questions = questions;
@@ -82,7 +95,8 @@ class _QuizScreenState extends State<QuizScreen> {
     if (_hasAnswered || !_engine.hasHearts || _isFinishing) return;
     setState(() {
       _selectedIndex = index;
-      _engine.answer(selectedIndex: index, correctIndex: _currentQuestion.correctIndex);
+      _engine.answer(
+          selectedIndex: index, correctIndex: _currentQuestion.correctIndex);
     });
   }
 
@@ -107,8 +121,8 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() => _isFinishing = true);
 
     try {
-      await _adMobService.showInterstitialAd();
-      final result = await _scoreService.completeQuiz(
+      await _showQuizCompleteAd();
+      final result = await _completeQuiz(
         categoryId: widget.category.id,
         score: _engine.score,
         correctAnswers: _engine.correctAnswers,
@@ -117,7 +131,9 @@ class _QuizScreenState extends State<QuizScreen> {
       );
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute<void>(builder: (_) => ResultScreen(result: result, category: widget.category)),
+        MaterialPageRoute<void>(
+            builder: (_) =>
+                ResultScreen(result: result, category: widget.category)),
       );
     } on Object catch (error) {
       if (!mounted) return;
@@ -131,7 +147,7 @@ class _QuizScreenState extends State<QuizScreen> {
   Future<void> _unlockExplanation() async {
     if (_isUnlocking || _fullExplanation != null) return;
     setState(() => _isUnlocking = true);
-    final explanation = await _explanationService.unlockFullExplanation(_currentQuestion);
+    final explanation = await _unlockFullExplanation(_currentQuestion);
     if (!mounted) return;
     setState(() {
       _fullExplanation = explanation;
@@ -142,12 +158,9 @@ class _QuizScreenState extends State<QuizScreen> {
   Future<void> _continueWithReward() async {
     if (_isContinuing || _engine.hasHearts) return;
     setState(() => _isContinuing = true);
-    final rewarded = await _adMobService.showRewardedAd(placement: 'continue_after_hearts');
+    await _continueQuizWithReward(_engine);
     if (!mounted) return;
     setState(() {
-      if (rewarded) {
-        _engine.restoreHearts(QuizEngine.rewardedContinueHearts);
-      }
       _isContinuing = false;
     });
   }
@@ -170,14 +183,18 @@ class _QuizScreenState extends State<QuizScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, color: AppColors.danger, size: 54),
+                const Icon(Icons.error_outline,
+                    color: AppColors.danger, size: 54),
                 const SizedBox(height: 14),
-                const Text('Could not start this quiz', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                const Text('Could not start this quiz',
+                    style:
+                        TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 8),
                 Text(
                   _loadError ?? 'No questions found for this category.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.muted, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                      color: AppColors.muted, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 18),
                 ElevatedButton.icon(
@@ -194,15 +211,22 @@ class _QuizScreenState extends State<QuizScreen> {
 
     final progress = (_currentIndex + 1) / _questions.length;
     final question = _currentQuestion;
-    final selectedIsWrong = _selectedIndex != null && _selectedIndex != question.correctIndex;
-    final shouldFinish = _currentIndex == _questions.length - 1 || !_engine.hasHearts;
+    final selectedIsWrong =
+        _selectedIndex != null && _selectedIndex != question.correctIndex;
+    final shouldFinish =
+        _currentIndex == _questions.length - 1 || !_engine.hasHearts;
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.category.title, style: const TextStyle(fontWeight: FontWeight.w900))),
+      appBar: AppBar(
+          title: Text(widget.category.title,
+              style: const TextStyle(fontWeight: FontWeight.w900))),
       body: ListView(
         padding: const EdgeInsets.all(18),
         children: [
-          ScoreHeader(score: _engine.score, hearts: _engine.hearts, coins: _engine.coinsEarned),
+          ScoreHeader(
+              score: _engine.score,
+              hearts: _engine.hearts,
+              coins: _engine.coinsEarned),
           const SizedBox(height: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(99),
@@ -214,12 +238,16 @@ class _QuizScreenState extends State<QuizScreen> {
             ),
           ),
           const SizedBox(height: 18),
-          Text('Question ${_currentIndex + 1}/${_questions.length}', style: const TextStyle(color: AppColors.muted, fontWeight: FontWeight.w800)),
+          Text('Question ${_currentIndex + 1}/${_questions.length}',
+              style: const TextStyle(
+                  color: AppColors.muted, fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: Text(question.question, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, height: 1.25)),
+              child: Text(question.question,
+                  style: const TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.w900, height: 1.25)),
             ),
           ),
           const SizedBox(height: 12),
@@ -251,7 +279,10 @@ class _QuizScreenState extends State<QuizScreen> {
               OutlinedButton.icon(
                 onPressed: _isContinuing ? null : _continueWithReward,
                 icon: _isContinuing
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(Icons.favorite),
                 label: const Text('Watch mock rewarded ad to continue'),
               ),
@@ -259,7 +290,10 @@ class _QuizScreenState extends State<QuizScreen> {
             ElevatedButton(
               onPressed: _isFinishing ? null : _next,
               child: _isFinishing
-                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2))
                   : Text(shouldFinish ? 'Finish Quiz' : 'Next Question'),
             ),
           ],

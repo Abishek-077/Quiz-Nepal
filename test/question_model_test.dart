@@ -2,17 +2,22 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:quiz_battle_nepal/data/category_catalog.dart';
-import 'package:quiz_battle_nepal/models/question_model.dart';
+import 'package:quiz_battle_nepal/features/quiz/data/category_catalog.dart';
+import 'package:quiz_battle_nepal/features/quiz/data/models/question_dto.dart';
 
 void main() {
-  test('Question.fromJson parses a valid question', () {
-    final question = Question.fromJson({
+  test('QuestionDto.fromJson parses a valid question', () {
+    final question = QuestionDto.fromJson({
       'id': 'dl_001',
       'category': 'driving_license',
       'subCategory': 'bike',
       'question': 'What should you do when the traffic light is red?',
-      'options': ['Go fast', 'Stop before the stop line', 'Horn and move', 'Turn immediately'],
+      'options': [
+        'Go fast',
+        'Stop before the stop line',
+        'Horn and move',
+        'Turn immediately'
+      ],
       'correctIndex': 1,
       'shortExplanation': 'Red light means stop.',
       'fullExplanation': 'Stop before the stop line until the signal changes.',
@@ -23,9 +28,9 @@ void main() {
     expect(question.correctIndex, 1);
   });
 
-  test('Question.fromJson rejects malformed option and answer data', () {
+  test('QuestionDto.fromJson rejects malformed option and answer data', () {
     expect(
-      () => Question.fromJson({
+      () => QuestionDto.fromJson({
         'id': 'bad_001',
         'category': 'driving_license',
         'question': 'Bad question',
@@ -41,10 +46,14 @@ void main() {
   test('local JSON question files are loadable and match their category', () {
     var total = 0;
     for (final category in CategoryCatalog.all) {
-      final decoded = jsonDecode(File(category.assetPath).readAsStringSync()) as List<dynamic>;
-      final questions = decoded.map((item) => Question.fromJson(item as Map<String, dynamic>)).toList();
+      final decoded = jsonDecode(File(category.assetPath).readAsStringSync())
+          as List<dynamic>;
+      final questions = decoded
+          .map((item) => QuestionDto.fromJson(item as Map<String, dynamic>))
+          .toList();
       expect(questions, hasLength(greaterThanOrEqualTo(10)));
-      expect(questions.every((question) => question.category == category.id), isTrue);
+      expect(questions.every((question) => question.category == category.id),
+          isTrue);
       total += questions.length;
     }
 

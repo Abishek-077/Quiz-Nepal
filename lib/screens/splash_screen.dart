@@ -17,7 +17,8 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future<void>.delayed(const Duration(milliseconds: 1100), () {
       if (!mounted) return;
-      Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => const HomeScreen()));
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute<void>(builder: (_) => const HomeScreen()));
     });
   }
 
@@ -41,7 +42,10 @@ class _SplashScreenState extends State<SplashScreen> {
             Text(
               AppStrings.appName,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900),
             ),
             SizedBox(height: 10),
             Padding(
@@ -49,7 +53,10 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Text(
                 AppStrings.tagline,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700),
               ),
             ),
           ],

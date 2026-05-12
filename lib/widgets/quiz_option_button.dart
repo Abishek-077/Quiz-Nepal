@@ -51,11 +51,15 @@ class QuizOptionButton extends StatelessWidget {
             CircleAvatar(
               radius: 17,
               backgroundColor: AppColors.secondary,
-              child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+              child: Text(label,
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w900)),
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              child: Text(text,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w700)),
             ),
             if (trailingIcon != null) Icon(trailingIcon, color: borderColor),
           ],
