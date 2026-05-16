@@ -10,6 +10,7 @@ class QuizOptionButton extends StatelessWidget {
     this.isSelected = false,
     this.isCorrect = false,
     this.showResult = false,
+    this.leadingIcon,
     super.key,
   });
 
@@ -19,14 +20,18 @@ class QuizOptionButton extends StatelessWidget {
   final bool isSelected;
   final bool isCorrect;
   final bool showResult;
+  final Widget? leadingIcon;
 
   @override
   Widget build(BuildContext context) {
-    Color borderColor = Colors.transparent;
+    Color borderColor = AppColors.border;
     Color backgroundColor = AppColors.card;
     IconData? trailingIcon;
 
-    if (showResult && isCorrect) {
+    if (!showResult && isSelected) {
+      borderColor = AppColors.secondary;
+      backgroundColor = AppColors.secondary.withValues(alpha: 0.06);
+    } else if (showResult && isCorrect) {
       backgroundColor = AppColors.success.withValues(alpha: 0.14);
       borderColor = AppColors.success;
       trailingIcon = Icons.check_circle;
@@ -38,28 +43,43 @@ class QuizOptionButton extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(14),
       child: Ink(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: borderColor, width: 1.6),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: borderColor, width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.text.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 17,
-              backgroundColor: AppColors.secondary,
-              child: Text(label,
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w900)),
-            ),
+            leadingIcon ??
+                CircleAvatar(
+                  radius: 23,
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
             const SizedBox(width: 14),
             Expanded(
               child: Text(text,
                   style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w700)),
+                      color: AppColors.text,
+                      fontSize: 18,
+                      height: 1.25,
+                      fontWeight: FontWeight.w800)),
             ),
             if (trailingIcon != null) Icon(trailingIcon, color: borderColor),
           ],
